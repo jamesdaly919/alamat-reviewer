@@ -1,0 +1,82 @@
+/* Source: Science 2, 1st Trim Reviewer SY 2026–2027, pp. 1–7.
+   Diagrams are redrawn with exact marks; water vapour is distinguished from visible mist. */
+(function(){
+  const mc=(q,choices,answer,why,extra={})=>({type:'mc',q,choices,answer,why,emoji:'🔬',...extra});
+  const skillChoices=['Observing','Inferring','Predicting','Classifying'];
+  REVIEWER.register({id:'science-1t',subject:'science',title:'Science 2',subtitle:'1st Trimester · Curious explorers',topics:[
+    {id:'process',title:'Think like a scientist',emoji:'🔍',intro:'Observation: what you notice. Inference: an explanation from clues. Prediction: what may happen next.',questions:[
+      mc('Which science skill uses the senses to gather information?',['Inferring','Measuring','Observing','Predicting'],2,'Observing means using one or more senses to notice information. Use only senses that are safe for the situation.',{emoji:'👀'}),
+      mc('Which skill gives an explanation based on an observation?',['Inferring','Measuring','Observing','Predicting'],0,'An inference explains what the clues might mean. It is not something directly observed.'),
+      mc('A plant has dry soil and drooping leaves. What will most likely happen if it continues without water?',['It will become healthier.','It will grow many new leaves.','It may wilt and die.','It will turn into a rock.'],2,'Plants need water. Without enough water, the plant may wilt and eventually die.',{emoji:'🥀'}),
+      mc('You can see a tree with no leaves. Which sentence is an observation?',['The owner forgot to water it.','The tree has no leaves.','The tree must be dead.','The weather caused it.'],1,'You can see that the leaves are absent. The other sentences are explanations that need more evidence.',{emoji:'🔍'}),
+      mc('A boy wears a raincoat and carries an open umbrella outdoors. Which is the best inference from these clues?',['He is probably outside in rainy weather.','He is swimming in a pool.','He is definitely playing basketball.','He is inside a classroom.'],0,'The raincoat and umbrella suggest rainy weather. “Probably” matters because an inference is based on clues.',{emoji:'☔'}),
+      mc('A girl’s clothes are wet and there are puddles outside. Which sentence is an inference?',['The clothes are wet.','There are puddles.','It probably rained recently.','The girl is wearing clothes.'],2,'Recent rain is a possible explanation for the wet clothes and puddles. The wet clothes and puddles themselves are observations.',{emoji:'🌧️'}),
+      mc('Mia says, “The leaf is green.” Which skill is she using?',skillChoices,0,'She is describing a color she can see: observing.',{emoji:'🍃'}),
+      mc('Ben sees dark clouds and says, “It may rain later.” Which skill is he using?',skillChoices,2,'He is saying what may happen in the future: predicting.',{emoji:'☁️'}),
+      mc('Ana sees bite marks on a leaf and says, “An insect may have eaten part of it.” Which skill is she using?',skillChoices,1,'She uses the bite marks to suggest an explanation: inferring.',{emoji:'🐛'}),
+      mc('Which sentence is a prediction?',['The ice cube is solid now.','The ice cube feels cold.','The ice cube may melt if left in a warm room.','There are two ice cubes.'],2,'A prediction tells what may happen next. The other sentences describe the ice now.',{emoji:'🧊'}),
+      mc('Which observation uses hearing?',['The bell sounds loud.','The bell is gold.','The bell feels smooth.','The bell is round.'],0,'We use our ears to hear sound.',{emoji:'🔔'}),
+      mc('Which observation uses touch?',['The ball is blue.','The ball feels smooth.','The ball makes a bouncing sound.','The ball is beside a chair.'],1,'Touch lets us notice texture, such as smooth or rough.',{emoji:'🏀'}),
+    ]},
+    {id:'classify',title:'Sorting detectives',emoji:'🧺',intro:'Use the rule in the question. Things in a group share the named feature.',questions:[
+      mc('Which skill groups objects by their similarities?',['Classifying','Inferring','Measuring','Predicting'],0,'Classifying means sorting things into groups using a shared feature.'),
+      mc('The rule is YELLOW fruit. Which group follows it?',['Yellow banana, yellow lemon, yellow mango','Red apple, red cherry, red strawberry','Purple grape, blueberry, purple plum'],0,'Every fruit in the first group is described as yellow.',{emoji:'🍌'}),
+      mc('Which animal does NOT belong in this group of common farm animals?',['Chicken','Cow','Elephant','Sheep'],2,'Chickens, cows and sheep are commonly raised on farms. An elephant does not fit this group.',{emoji:'🐘'}),
+      mc('Sort by SHAPE. Which object belongs with a round coin?',['A round button','A square tile','A triangular flag'],0,'The coin and button share a round shape.',{emoji:'🪙'}),
+      mc('Sort by TEXTURE. Which belongs with a smooth marble?',['Rough sandpaper','A smooth glass bead','A prickly seed pod'],1,'The marble and glass bead are both described as smooth.',{emoji:'🔮'}),
+      mc('Which rule groups a red ball, a red cup and a red pencil together?',['Same size','Same use','Same color'],2,'They are all red. The sentence does not say they have the same size or use.',{emoji:'🔴'}),
+      mc('The group is “things used for writing.” Which does NOT belong?',['Pencil','Crayon','Spoon'],2,'Pencils and crayons are used for writing or drawing. A spoon is an eating tool.',{emoji:'✏️'}),
+      mc('The rule is SOLID objects. Which group fits?',['Wooden block and metal spoon','Water and milk','Air and water vapour'],0,'A wooden block and metal spoon are solids with their own shape.',{emoji:'🧱'}),
+    ]},
+    {id:'measure',title:'Ruler explorers',emoji:'📏',intro:'Start at zero, find the other end, and read the unit. A diagram’s marked ruler is what matters, even on a small screen.',questions:[
+      mc('Which skill uses a ruler to find the length of an object?',['Classifying','Inferring','Measuring','Predicting'],2,'Measuring finds a quantity, such as length, using a tool and unit.',{emoji:'📏'}),
+      mc('What is the pencil’s length on this ruler?',['5 inches','5 centimeters','10 inches','10 centimeters'],0,'The pencil begins at 0 and ends at 5. The ruler is marked in inches: 5 inches.',{visual:{kind:'ruler',end:5,unit:'inches'}}),
+      mc('What is the pencil’s length on this ruler?',['7 centimeters','7 inches','8 centimeters','8 inches'],1,'Read both the number and unit. The pencil runs from 0 to 7 inches.',{visual:{kind:'ruler',end:7,unit:'inches'}}),
+      mc('Where should the beginning of an object be placed when measuring from zero?',['At the 1 mark','At the 5 mark','At the zero mark','At any number without checking'],2,'Align the beginning with zero, then read the mark at the other end.',{emoji:'📏'}),
+      mc('Pia wants to know which is longer, her pencil or her ruler. What should she do?',['Smell them.','Compare their colors.','Measure their lengths using the same unit.','Compare their textures.'],2,'Measurements in the same unit allow a fair length comparison.',{emoji:'✏️'}),
+      mc('What is the length of this pencil?',['6 centimeters','6 inches','5 centimeters','7 centimeters'],0,'The pencil goes from 0 to 6 on a ruler marked in centimeters.',{visual:{kind:'ruler',end:6,unit:'cm'}}),
+      mc('What is the length of this pencil?',['3 inches','4 centimeters','3 centimeters','4 inches'],2,'Its ends are at 0 and 3. The unit is cm, meaning centimeters.',{visual:{kind:'ruler',end:3,unit:'cm'}}),
+      mc('A pencil is 8 cm long. A crayon is 5 cm long. Which is longer?',['Pencil','Crayon','They are equal'],0,'Both lengths use centimeters. 8 is greater than 5.',{emoji:'📏'}),
+      mc('Why should you write “cm” after a length measured in centimeters?',['To tell the color','To tell the unit','To tell the owner'],1,'A measurement needs a number and a unit so others know what it means.',{emoji:'📏'}),
+      mc('A pencil lies from mark 2 to mark 7 on a centimeter ruler. What is its length?',['7 cm','9 cm','5 cm','2 cm'],2,'It spans 5 one-centimeter spaces. 7 − 2 = 5 cm. The end mark alone is not the length when the start is not zero.',{visual:{kind:'ruler',start:2,end:7,unit:'cm'}}),
+    ]},
+    {id:'properties',title:'Materials & their properties',emoji:'🧸',intro:'A property tells what a material is like. Choose a material whose properties fit the job.',questions:[
+      mc('A ball feels smooth when touched. Which property is described?',['Color','Shape','Size','Texture'],3,'Texture describes how a surface feels, such as smooth or rough.',{emoji:'🏀'}),
+      mc('Which is best for wiping up water from a table?',['Sandpaper','Soft absorbent cloth','Rock','Metal ruler'],1,'An absorbent cloth soaks up the water. The other choices are poor tools for wiping up a spill.',{emoji:'💦'}),
+      mc('Which material is suitable for filling a soft pillow?',['Cotton','Glass','Metal','Stone'],0,'Cotton is soft and comfortable. Glass, metal and stone are hard.',{emoji:'🛏️'}),
+      mc('“The toy is blue.” Which property is described?',['Texture','Color','Shape','Length'],1,'Blue is a color.',{emoji:'🔵'}),
+      mc('“The block is a cube.” Which property is described?',['Shape','Smell','Color','Texture'],0,'Cube names a three-dimensional shape.',{emoji:'🧊'}),
+      mc('Which described material would feel rough?',['Smooth glass','Rough sandpaper','Soft cotton'],1,'Sandpaper has a rough surface. Read the texture words in the choices.',{emoji:'🖐️'}),
+      mc('Which material is most suitable for a hard, sturdy spoon?',['Loose cotton','Water','Metal'],2,'Metal is solid and sturdy enough to form a spoon.',{emoji:'🥄'}),
+      mc('Two balls have the same color, but one is large and one is small. Which property is different?',['Color','Size','Both must have different smells'],1,'Large and small describe size. The question says the colors match.',{emoji:'⚽'}),
+    ]},
+    {id:'matter',title:'Solids, liquids & gases',emoji:'🧊',intro:'A solid keeps its own shape. A liquid flows and takes its container’s shape. A gas spreads to fill available space.',questions:[
+      mc('Which state of matter has its own definite shape and definite volume?',['Gas','Liquid','Solid'],2,'A solid, such as a spoon, has its own shape and takes up a definite amount of space.',{emoji:'🥄'}),
+      mc('Classify milk, a metal spoon and water vapour (water as a gas).',['Milk: solid; spoon: liquid; vapour: gas','Milk: liquid; spoon: solid; vapour: gas','Milk: gas; spoon: solid; vapour: liquid'],1,'Milk flows, the spoon keeps its shape, and water vapour is water in the gas state. The white mist above a pot contains tiny liquid droplets.',{emoji:'🥛'}),
+      mc('Which is a liquid at ordinary room temperature?',['Wooden block','Milk','Air'],1,'Milk flows and takes the shape of its container.',{emoji:'🥛'}),
+      mc('What is the air inside a balloon?',['A solid','A liquid','A gas'],2,'Air is a mixture of gases. It fills the inside of the balloon.',{emoji:'🎈'}),
+      mc('Pour water from a cup into a bowl without spilling. What changes?',['The water’s shape','The water becomes a solid','The water becomes wood'],0,'Liquid water takes the shape of its new container. The amount stays the same if none is lost.',{emoji:'💧'}),
+      mc('Which keeps its own shape when moved from a plate to a cup?',['Water','Milk','A small stone'],2,'A stone is solid. Moving it does not make it take the cup’s shape.',{emoji:'🪨'}),
+      mc('Which description fits a liquid?',['It has its own fixed shape like a block.','It flows and has a definite volume.','It always fills an entire room.'],1,'A liquid flows and changes shape to fit its container, while keeping its volume.',{emoji:'💧'}),
+      mc('Which is an example of a solid?',['Metal ruler','Air','Water in a glass'],0,'The ruler has its own shape and volume.',{emoji:'📏'}),
+    ]},
+    {id:'changes',title:'Heat & changing states',emoji:'☀️',intro:'Heating and cooling can change matter. Notice the starting state and the ending state.',questions:[
+      mc('Which example shows temperature changing a state of matter?',['Rolling clay into a ball','Cutting paper','Drawing a picture','Chocolate melting in the sun'],3,'Heat can change solid chocolate into melted liquid chocolate. The other actions change shape or appearance.',{emoji:'🍫'}),
+      mc('Water is put in a freezer and becomes ice. What happened?',['Condensation','Evaporation','Freezing','Melting'],2,'Freezing changes a liquid into a solid as it loses heat.',{emoji:'🧊'}),
+      mc('Carlo says ice cream melts because it gains heat from its surroundings. Is he correct?',['No, heat makes all solids freeze.','Yes, cold makes it melt.','Yes, gaining heat can cause it to melt.','No, ice cream cannot change state.'],2,'Ice cream gains heat in a warm place and melts.',{emoji:'🍦'}),
+      mc('An ice cube becomes liquid water in a warm room. What is this change called?',['Freezing','Melting','Condensation'],1,'Melting changes a solid into a liquid.',{emoji:'🧊'}),
+      mc('What change happens when liquid water becomes water vapour?',['Evaporation','Freezing','Melting'],0,'Evaporation changes liquid water into water vapour, a gas.',{emoji:'💧'}),
+      mc('Water vapour in the air cools and forms liquid drops on the outside of a cold glass. What is this called?',['Melting','Freezing','Condensation'],2,'Condensation changes water from gas to liquid. The drops come from the air around the glass.',{emoji:'🥤'}),
+      mc('Which change goes from LIQUID to SOLID?',['Ice melting','Water freezing','Water evaporating'],1,'Water starts as a liquid and ends as solid ice.',{emoji:'❄️'}),
+      mc('You cut a sheet of paper into two pieces. What happened to its state?',['It stayed solid.','It became liquid.','It became gas.'],0,'Cutting changes the paper’s size and shape, but both pieces are still solid.',{emoji:'📄'}),
+    ]},
+    {id:'care',title:'Safe science & caring habits',emoji:'🧰',intro:'Use tools carefully, ask for help when needed, and put materials away properly.',questions:[
+      mc('What should you do with school materials after using them?',['Leave them on the floor.','Throw useful materials away.','Return them to their proper places.','Leave them outside.'],2,'Putting materials away keeps them safe and ready for the next user.',{emoji:'🎒'}),
+      mc('How should scissors be handled?',['As a toy','While running','Carefully and properly','Left open on the floor'],2,'Scissors are cutting tools. Use them as instructed and keep them away from people’s bodies.',{emoji:'✂️'}),
+      mc('Miguel needs sharp scissors and a hot glue gun for a project. What is the safest choice?',['Play with them.','Use them secretly.','Rush to finish first.','Ask an adult for help and use them carefully.'],3,'Sharp tools can cut and hot tools can burn. An adult should help.',{emoji:'🧰'}),
+      mc('You find an unknown liquid during an activity. What should you do?',['Taste it to identify it.','Ask the teacher before handling it.','Rub it on your skin.'],1,'Never taste or touch unknown substances. Ask the teacher how to observe safely.',{emoji:'🧪'}),
+      mc('You notice broken glass on the classroom floor. What should you do?',['Pick it up with bare hands.','Play beside it.','Keep away and tell an adult.'],2,'Broken glass can cut. An adult should clean it up safely.',{emoji:'⚠️'}),
+      mc('Which action keeps a shared worktable ready for the next group?',['Leave a puddle.','Clean up as instructed and return the tools.','Hide the tools.'],1,'Cleaning and returning tools shows care for materials and classmates.',{emoji:'🧹'}),
+    ]},
+  ]});
+})();

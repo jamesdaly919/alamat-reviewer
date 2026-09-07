@@ -160,3 +160,65 @@ u { text-decoration: underline; text-decoration-thickness: 2px; text-underline-o
 canvas.confetti { position: fixed; inset: 0; pointer-events: none; z-index: 9; }
 
 .footer-note { text-align: center; color: var(--ink-2); font-size: 12px; font-weight: 700; margin-top: 28px; }
+
+/* Four new subject adventures and accessible activities. */
+.subject[data-subject="cl"] .badge, .exam-btn[data-subject="cl"] { background: #7952ad; }
+.subject[data-subject="ap"] .badge, .exam-btn[data-subject="ap"] { background: #b35d17; }
+.subject[data-subject="math"] .badge, .exam-btn[data-subject="math"] { background: #176fac; }
+.subject[data-subject="science"] .badge, .exam-btn[data-subject="science"] { background: #187762; }
+.topic-emoji { font-size: 30px; }
+.session-options { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:18px 0 8px; font-size:14px; }
+.session-options select { flex:1; min-height:44px; max-width:100%; border:1px solid var(--line); border-radius:12px; padding:8px; background:var(--surface); color:var(--ink); font:inherit; }
+.learning-visual { margin:18px 0 12px; padding:12px; border:1px solid var(--line); border-radius:16px; background:var(--surface-2); }
+.learning-visual svg { display:block; width:100%; height:auto; }
+.learning-visual figcaption, .map-guide { font-size:12px; color:var(--ink-2); text-align:center; margin:5px 0; }
+.town-map { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; margin:10px 0; }
+.town-map div { padding:16px 3px; background:var(--surface); border:1px solid var(--line); border-radius:10px; text-align:center; font-size:14px; overflow-wrap:anywhere; }
+.blocks { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; text-align:center; }
+.blocks b { font-size:14px; } .blocks small { font-size:11px; }
+.block-icons { display:flex; flex-wrap:wrap; justify-content:center; min-height:50px; align-items:center; gap:3px; color:var(--english); font-size:28px; }
+.money-pile { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; }
+.play-money { display:grid; border:2px dashed #318b53; border-radius:8px; padding:8px 15px; background:#e2f4d4; color:#204c32; text-align:center; font-size:24px; }
+.play-money small { font-size:8px; letter-spacing:1px; }
+.animal-line { display:flex; flex-wrap:wrap; gap:6px; padding-top:8px; }
+.animal-line>span { display:grid; justify-items:center; min-width:55px; flex:1; border:1px solid var(--line); background:var(--surface); border-radius:9px; padding:5px 2px; }
+.animal-line b { font-size:26px; } .animal-line small { font-size:11px; }
+.input-form { margin-top:20px; } .input-form label, label[for="reflection"] { display:block; font-size:14px; font-weight:800; margin:10px 0; }
+.input-form input, #reflection { width:100%; min-height:56px; padding:12px; border:2px solid var(--line); border-radius:12px; background:var(--surface); color:var(--ink); font:inherit; }
+.input-form input { font-size:24px; font-variant-numeric:tabular-nums; }
+input:focus-visible, textarea:focus-visible, select:focus-visible { outline:3px solid var(--sun); outline-offset:2px; }
+.activity-help { color:var(--ink-2); font-size:14px; margin:18px 0 10px; }
+.map-pieces { display:flex; gap:8px; flex-wrap:wrap; }
+.map-piece { border:2px solid var(--line); border-radius:12px; min-height:48px; padding:8px 12px; background:var(--surface-2); }
+.map-piece[aria-pressed="true"] { border-color:var(--green); background:var(--green-soft); }
+.place-map { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); grid-template-areas:". n ." "w c e" ". s ."; gap:8px; margin-top:15px; }
+.map-cell { min-height:90px; border:2px dashed var(--line); border-radius:14px; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:7px; background:var(--surface-2); }
+.map-cell span { font-size:16px; overflow-wrap:anywhere; } .map-cell small { font-size:12px; }
+.map-cell[data-dir="Hilaga"] { grid-area:n; } .map-cell[data-dir="Timog"] { grid-area:s; }
+.map-cell[data-dir="Kanluran"] { grid-area:w; } .map-cell[data-dir="Silangan"] { grid-area:e; }
+.map-cell[data-dir="Gitna"] { grid-area:c; }
+.draw-details, .translation-panel details { margin-top:12px; }
+summary { cursor:pointer; min-height:44px; padding:10px 0; font-weight:800; }
+.drawing { width:100%; height:auto; aspect-ratio:2; background:white; border:2px solid var(--line); border-radius:12px; touch-action:none; display:block; }
+.clear-drawing { min-height:44px; padding:8px 12px; border:1px solid var(--line); border-radius:10px; margin-top:8px; }
+.translation-lock { font-size:13px; color:var(--ink-2); background:var(--surface-2); border-radius:12px; padding:10px; }
+.translation-panel { padding:14px; margin-top:16px; border:2px solid var(--green); border-radius:16px; background:var(--green-soft); }
+.translation-panel h3 { margin:0; font-size:18px; font-family:var(--display); }
+.translation-panel p { font-size:14px; }
+.word-meaning { background:var(--surface); padding:14px; border-radius:10px; font-weight:800; min-height:52px; }
+.translate-word { display:inline; padding:2px 0; font:inherit; color:inherit; text-decoration:underline dotted; text-underline-offset:4px; text-decoration-color:var(--green); border-radius:3px; }
+.translate-word:hover, .translate-word:focus-visible { background:var(--sun-soft); }
+.answered-choice { cursor:default; }
+.feedback.neutral { background:var(--english-soft); }
+.feedback ul { margin:10px 0; padding-left:20px; font-size:14px; }
+.source-note { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:10px 14px; margin-top:18px; font-size:13px; }
+@media (max-width:420px) {
+  #app { padding-left:12px; padding-right:12px; }
+  .card { padding:15px; } .qhead { gap:10px; }
+  .qart { width:52px; height:52px; font-size:32px; padding:5px; border-radius:14px; }
+  .qtext { font-size:20px; } .subject { padding:14px; gap:10px; grid-template-columns:52px 1fr auto; }
+  .subject .badge { width:52px; height:52px; } .subject h2 { font-size:21px; }
+  .topbar .title { font-size:17px; } .topic { padding:12px; gap:9px; }
+  .town-map div { font-size:12px; } .map-guide { font-size:11px; }
+  .map-cell span { font-size:13px; }
+}

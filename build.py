@@ -14,7 +14,7 @@ html = read('index.html')
 css = read('styles.css')
 manifest = read('data/manifest.js')
 paths = re.findall(r"'([^']+\.js)'", manifest)
-scripts = [read('data/illustrations.js'), read('app.js')] + [read(p) for p in paths]
+scripts = [read('data/illustrations.js'), read('data/activities.js'), read('app.js')] + [read(p) for p in paths]
 bundle = "<script>window.REVIEWER_BUNDLED=true;</script>\n" + "\n".join(f"<script>\n{s}\n</script>" for s in scripts)
 
 html = html.replace('<link rel="stylesheet" href="styles.css">', f"<style>\n{css}\n</style>")
