@@ -4,32 +4,61 @@ const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const root = path.join(__dirname, '..');
 const modules = [];
-const context = vm.createContext({ window: {}, REVIEWER: { register: m => modules.push(m) } });
+const context = vm.createContext({ window: {}, REVIEWER: { register: m => {
+  context.window.REVIEWER_EXPAND(m);
+  m.topics.forEach(t=>t.questions.forEach((q,i)=>q.id=`${m.id}/${t.id}/${i+1}`));
+  modules.push(m);
+} } });
+for(const f of ['practice','expansion','fact-expansion','option-pools'])vm.runInContext(fs.readFileSync(path.join(root,`data/${f}.js`),'utf8'),context);
+vm.runInContext('let seed=74261; Math.random=()=>((seed=(Math.imul(seed,1664525)+1013904223)>>>0)/4294967296)',context);
 vm.runInContext(fs.readFileSync(path.join(root,'data/manifest.js'),'utf8'),context);
 for (const f of context.window.REVIEWER_MANIFEST) vm.runInContext(fs.readFileSync(path.join(root,f),'utf8'),context,{filename:f});
 assert.equal(modules.length,6);
-const newModules=modules.filter(m=>['cl','ap','math','science'].includes(m.subject));
+const newModules=modules;
 let count=0, diagrams=0, generatedSums=0;
 for(const m of newModules){
   const ids=new Set(), prompts=new Set();
   for(const t of m.topics){
     assert(!ids.has(t.id),'Duplicate topic '+t.id);ids.add(t.id);
-    assert(t.questions.length>0);
+    assert(t.questions.length>=20,`Small bank ${m.id}/${t.id}`);
+    let seen=[];
+    const first=context.window.REVIEWER_PRACTICE.draw(t.questions,10,seen);
+    const second=context.window.REVIEWER_PRACTICE.draw(t.questions,10,first.seen);
+    assert.equal(first.questions.length,10);assert.equal(second.questions.length,10);
+    assert.equal(new Set([...first.questions,...second.questions].map(q=>q.id)).size,20,'Repeated question before unseen bank is exhausted');
+    for(let round=0;round<12;round++){
+      const draw=context.window.REVIEWER_PRACTICE.draw(t.questions,10,seen);seen=draw.seen;
+      assert.equal(new Set(draw.questions.map(q=>q.id)).size,10,'Duplicate within round');
+    }
     for(const q of t.questions){
       count++; const label=`${m.id}/${t.id}: ${q.q}`;
-      const signature=JSON.stringify([q.q,q.visual||null,q.passage||null]);
+      const signature=JSON.stringify([q.q,q.visual||null,q.passage||null,q.choices||null]);
       assert(!prompts.has(signature),'Duplicate prompt and visual '+label);prompts.add(signature);
       assert(q.q && (q.why || q.type==='reflect'), 'Missing explanation '+label);
       assert(['mc','tf','input','build','place','reflect'].includes(q.type));
       if(q.type==='mc'){
         assert(Number.isInteger(q.answer) && q.answer>=0 && q.answer<q.choices.length,label);
-        assert.equal(new Set(q.choices.map(c=>c.trim().toLowerCase())).size,q.choices.length,'Duplicate options '+label);
+        assert.equal(new Set(q.choices.map(c=>c.trim())).size,q.choices.length,'Duplicate options '+label);
+        const before=JSON.stringify(q),correct=q.choices[q.answer],positions=new Set(),options=new Set();
+        let prepared=q;
+        for(let i=0;i<160;i++){
+          prepared=context.window.REVIEWER_PRACTICE.prepare(prepared); // Include repeated retries.
+          assert.equal(prepared.choices[prepared.answer],correct,'Shuffle changed correct answer '+label);
+          assert.equal(prepared.choices.filter(c=>c===correct).length,1);
+          assert.equal(new Set(prepared.choices).size,prepared.choices.length);
+          assert(prepared.choices.length>=2&&prepared.choices.length<=4);
+          positions.add(prepared.answer);prepared.choices.forEach(c=>options.add(c));
+        }
+        assert(positions.size>=2,'Answer stuck in one position '+label);
+        assert.equal(options.size,new Set(q.choices.concat(q.distractors||[])).size,'Retry lost an option from the pool '+label);
+        assert.equal(JSON.stringify(q),before,'Canonical question mutated '+label);
       }
       if(q.type==='tf')assert.equal(typeof q.answer,'boolean',label);
       if(q.type==='input')assert(String(q.answer).trim(),label);
       if(q.type==='build'){
-        const result=q.answer.split(q.join===undefined?' ':q.join).sort();
-        assert.equal(JSON.stringify(result),JSON.stringify([...q.tiles].sort()),'Unbuildable '+label);
+        const join=q.join===undefined?' ':q.join;
+        const possible=(remaining,tiles)=>tiles.some((tile,i)=>remaining===tile || remaining.startsWith(tile+join)&&possible(remaining.slice(tile.length+join.length),tiles.filter((_,j)=>j!==i)));
+        for(const answer of [q.answer,...(q.alt||[])])assert(possible(answer,q.tiles),'Unbuildable '+label);
       }
       if(q.type==='place'){
         assert.equal(new Set(q.pieces.map(p=>p.at)).size,q.pieces.length,label);
@@ -46,7 +75,7 @@ for(const m of newModules){
         // Independent column addition oracle including carried tens/hundreds.
         const a=String(q.calculation[0]).padStart(3,'0'),b=String(q.calculation[1]).padStart(3,'0');
         let carry=0, answer='';for(let i=2;i>=0;i--){const n=Number(a[i])+Number(b[i])+carry;answer=String(n%10)+answer;carry=n>=10?1:0;}if(carry)answer='1'+answer;
-        assert.equal(Number(q.answer),Number(answer),'Wrong sum '+label);generatedSums++;
+        assert.equal(Number(q.type==='mc'?q.choices[q.answer]:q.answer),Number(answer),'Wrong sum '+label);generatedSums++;
       }
     }
   }
@@ -64,4 +93,17 @@ for(const [prompt,expected] of [
   ['Which number has a tens digit with a VALUE of 30?','435'],
   ['Lara celebrated her 16th birthday two years ago. Which birthday will she celebrate this year?','18th'],
 ]) {const q=all.find(q=>q.q===prompt);assert(q,prompt);assert.equal(q.type==='mc'?q.choices[q.answer]:q.answer,expected,prompt);}
-console.log(`PASS: ${count} new items, ${diagrams} diagrams, ${generatedSums} sums, source-key checks and content invariants.`);
+// Independent visual answer oracles: count the actual depicted objects.
+for(const q of all){
+ const correct=q.type==='mc'?q.choices[q.answer]:q.answer;
+ if(q.visual?.kind==='blocks')assert.equal(Number(correct),q.visual.values.reduce((n,v,i)=>n+v*[100,10,1][i],0));
+ if(q.visual?.kind==='money')assert.equal(Number(correct),q.visual.notes.reduce((a,b)=>a+b,0));
+ if(q.visual?.kind==='line'){
+   const position=Number(q.q.match(/(\d+)(?:st|nd|rd|th)/)[1]);
+   assert.equal(correct.toLowerCase(),q.visual.items[position-1][1]);
+ }
+}
+const activitySource=fs.readFileSync(path.join(root,'data/activities.js'),'utf8');
+assert(!activitySource.includes('${i+1}'),'Numbered animal labels returned');
+assert(!activitySource.includes('${v.values[i]} ${label'),'Block count labels returned');
+console.log(`PASS: ${count} items, ${diagrams} diagrams, ${generatedSums} sums; every topic >=20; rotation, sampled options, retries, visual answers and source-key checks.`);

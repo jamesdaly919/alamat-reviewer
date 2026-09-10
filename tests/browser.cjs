@@ -1,117 +1,97 @@
-/* Run with playwright available through NODE_PATH. Optional CDP_URL attaches
-   to the isolated agent-browser test profile. All writes use a fresh context. */
-const { chromium } = require('playwright');
-const assert = require('node:assert/strict');
-const path = require('node:path');
-const fs = require('node:fs');
-const base = process.env.REVIEWER_URL || 'http://127.0.0.1:8123';
-const out = path.resolve(__dirname,'../../source-review'); fs.mkdirSync(out,{recursive:true});
+/* Exhaustive tests use DOM clicks through real UI handlers in an isolated
+   context. Representative flows also use Playwright clicks and drawing. */
+const {chromium}=require('playwright'),assert=require('node:assert/strict');
+const path=require('node:path'),fs=require('node:fs');
+const base=process.env.REVIEWER_URL||'http://127.0.0.1:8123';
+const out=path.resolve(__dirname,'../../source-review');fs.mkdirSync(out,{recursive:true});
 (async()=>{
-  const browser=process.env.CDP_URL?await chromium.connectOverCDP(process.env.CDP_URL):await chromium.launch({channel:'chrome',args:['--no-sandbox']});
-  const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
-  const page=await context.newPage(); const errors=[];
-  page.on('pageerror',e=>errors.push(e.message));
-  page.on('response',r=>{if(r.url().startsWith(base)&&r.status()>=400)errors.push(`${r.status()} ${r.url()}`);});
-  await page.goto(base);await page.waitForFunction(()=>document.querySelectorAll('.subject').length===6);
-  await page.screenshot({path:path.join(out,'home-phone.png'),fullPage:true});
-  const counts=await page.evaluate(()=>REVIEWER.modules.map(m=>({subject:m.subject,topics:m.topics.length,count:m.topics.reduce((n,t)=>n+t.questions.length,0)})));
-  let passed=0;const screenshots=new Set();
-  for(const module of counts.filter(m=>['cl','ap','math','science'].includes(m.subject))){
-    for(let ti=0;ti<module.topics;ti++){
-      await page.locator(`.subject[data-subject="${module.subject}"]`).click();
-      await page.selectOption('#round-size','all');
-      const expected=await page.evaluate(({subject,ti})=>REVIEWER.modules.find(m=>m.subject===subject).topics[ti].questions.length,{subject:module.subject,ti});
-      await page.locator('.topic').nth(ti).click();
-      assert.equal(await page.locator('.pill').innerText(),`1 / ${expected}`);
-      for(let qi=0;qi<expected;qi++){
-        const q=await page.evaluate(()=>REVIEWER.modules.flatMap(m=>m.topics.flatMap(t=>t.questions)).find(q=>q.id===document.querySelector('[data-question-id]').dataset.questionId));
-        assert(q,'Question ID must resolve');
-        assert.equal(await page.locator('.feedback').count(),0);
-        if(module.subject==='ap'){
-          assert.equal(await page.locator('.translate-word,.translation-panel').count(),0,'AP English must be locked');
-          assert.equal(await page.locator('.translation-lock').count(),1);
-        }
-        if((q.type==='place'||q.visual?.kind==='ruler'||q.visual?.kind==='blocks')&&!screenshots.has(q.type==='place'?'map':q.visual.kind)){
-          const kind=q.type==='place'?'map':q.visual.kind;screenshots.add(kind);
-          await page.screenshot({path:path.join(out,`${kind}-phone.png`),fullPage:true});
-        }
-        if(q.type==='mc')await page.locator(`.choice[data-k="${q.answer}"]`).click();
-        else if(q.type==='tf')await page.locator(`.choice[data-k="${q.answer}"]`).click();
-        else if(q.type==='input'){
-          assert(await page.locator('.check-btn').isDisabled());
-          await page.fill('#written-answer',q.answer);await page.locator('.check-btn').click();
-        } else if(q.type==='build'){
-          const values=q.answer.split(q.join===undefined?' ':q.join);
-          for(const v of values)await page.locator('.tiles .tile:not(.used)').filter({hasText:new RegExp('^'+v.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'$')}).first().click();
-          await page.locator('.check-btn').click();
-        } else if(q.type==='place'){
-          assert(await page.locator('.check-btn').isDisabled());
-          for(let i=0;i<q.pieces.length;i++){await page.locator(`[data-piece="${i}"]`).click();await page.locator(`[data-dir="${q.pieces[i].at}"]`).click();}
-          await page.locator('.check-btn').click();
-        } else if(q.type==='reflect'){
-          assert(await page.locator('.check-btn').isDisabled());
-          await page.fill('#reflection','I can share my books and help a friend learn.');await page.locator('.check-btn').click();
-          assert.equal(await page.locator('.feedback.neutral').count(),1);
-        }
-        assert.equal(await page.locator(q.type==='reflect'?'.feedback.neutral':'.feedback.ok').count(),1,'Correct answer rejected: '+q.id);
-        if(module.subject==='ap'){
-          assert.equal(await page.locator('.translation-lock').count(),0);
-          assert.equal(await page.locator('.translation-panel').count(),1);
-          const word=page.locator('.translate-word').first();assert(await word.count(),'Missing word help '+q.id);
-          await word.click();assert((await page.locator('.word-meaning').innerText()).includes('→'));
-          if(!screenshots.has('translation')){screenshots.add('translation');await page.locator('.translation-panel summary').click();await page.screenshot({path:path.join(out,'ap-help-phone.png'),fullPage:true});}
-        }
-        const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+1);
-        assert(!overflow,'Horizontal overflow '+q.id);
-        await page.locator('.next-btn').click();passed++;
+ const browser=process.env.CDP_URL?await chromium.connectOverCDP(process.env.CDP_URL):await chromium.launch({channel:'chrome',args:['--no-sandbox']});
+ const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
+ const page=await context.newPage(),errors=[];
+ page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.url().startsWith(base)&&r.status()>=400)errors.push(r.status()+' '+r.url());});
+ const home=async()=>{await page.goto(base);await page.waitForFunction(()=>document.querySelectorAll('.subject').length===6);};
+ await home();const banks=await page.evaluate(()=>REVIEWER.modules);
+ assert.equal(banks.flatMap(m=>m.topics.flatMap(t=>t.questions)).length,1219);
+ await page.screenshot({path:path.join(out,'sep10-home-phone.png'),fullPage:true});
+ for(const module of banks){
+  const count=await page.evaluate(subject=>{
+   const check=(ok,msg)=>{if(!ok)throw Error(msg);},m=REVIEWER.modules.find(m=>m.subject===subject),norm=s=>s.replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();let count=0;
+   for(let ti=0;ti<m.topics.length;ti++){
+    const t=m.topics[ti],original=t.questions;
+    // Fixtures preserve the real round limit and exercise every item once.
+    for(let start=0;start<original.length;start+=10){
+     t.questions=original.slice(start,start+10);document.querySelector(`.subject[data-subject="${subject}"]`).click();document.querySelectorAll('.topic')[ti].click();
+     check(document.querySelector('.pill').textContent===`1 / ${t.questions.length}`,'Wrong round size');
+     for(let i=0;i<t.questions.length;i++){
+      const id=document.querySelector('[data-question-id]').dataset.questionId,q=t.questions.find(q=>q.id===id);check(q,'Missing ID');
+      if(subject==='ap')check(!document.querySelector('.translate-word,.translation-panel'),'Early translation '+id);
+      if(q.type==='mc'){
+       const b=[...document.querySelectorAll('.choice')].find(b=>norm(b.lastElementChild.textContent)===norm(q.choices[q.answer]));check(b,'Missing correct option '+id);b.click();
+      }else if(q.type==='tf')document.querySelector(`.choice[data-k="${q.answer}"]`).click();
+      else if(q.type==='input'){
+       const f=document.querySelector('input');f.value=q.answer;f.dispatchEvent(new Event('input'));document.querySelector('.check-btn').click();
+      }else if(q.type==='build'){
+       const join=q.join===undefined?' ':q.join;
+       const solve=(left,tiles)=>{for(let i=0;i<tiles.length;i++){const t=tiles[i];if(left===t.textContent)return[t];if(left.startsWith(t.textContent+join)){const r=solve(left.slice(t.textContent.length+join.length),tiles.filter((_,j)=>j!==i));if(r)return[t,...r];}}};
+       const tiles=solve(q.answer,[...document.querySelectorAll('.tiles .tile')]);check(tiles,'Unbuildable '+id);tiles.forEach(t=>t.click());document.querySelector('.check-btn').click();
+      }else if(q.type==='place'){
+       q.pieces.forEach((p,i)=>{document.querySelector(`[data-piece="${i}"]`).click();document.querySelector(`[data-dir="${p.at}"]`).click();});document.querySelector('.check-btn').click();
+      }else if(q.type==='reflect'){
+       const f=document.querySelector('textarea');f.value='I can share my books with a friend.';f.dispatchEvent(new Event('input'));document.querySelector('.check-btn').click();
       }
-      const score=await page.locator('.score').innerText();assert(['100%','🌟'].includes(score),`Unexpected score ${score}`);
-      await page.locator('.home').click();
-    }
-    console.log(`PASS full-topic correct paths: ${module.subject} (${module.count})`);
-  }
-  // Wrong answers, guarded scoring, retry only mistakes, AP reset, and coverage.
-  await page.locator('.subject[data-subject="ap"]').click();await page.locator('.exam-btn').click();
-  const topics=new Set();let wrong=0;
-  for(let i=0;i<20;i++){
-    const q=await page.evaluate(()=>REVIEWER.modules.flatMap(m=>m.topics.flatMap(t=>t.questions)).find(q=>q.id===document.querySelector('[data-question-id]').dataset.questionId));
-    topics.add(q.id.split('/')[1]);assert.notEqual(q.type,'reflect');
-    assert.equal(await page.locator('.translation-panel').count(),0);
-    if(q.type==='mc')await page.locator(`.choice[data-k="${(q.answer+1)%q.choices.length}"]`).click();
-    else {for(let j=0;j<q.pieces.length;j++){await page.locator(`[data-piece="${j}"]`).click();await page.locator(`[data-dir="${j===0?'Gitna':'Hilaga'}"]`).click();}await page.locator('.check-btn').click();}
-    assert.equal(await page.locator('.feedback.bad').count(),1);wrong++;
-    await page.locator('.next-btn').click();
-  }
-  assert.equal(topics.size,5,'Mock exam should cover every scored AP topic');
-  assert.equal(await page.locator('.score').innerText(),'0%');
-  await page.locator('.retry').click();assert.equal(await page.locator('.pill').innerText(),'1 / 20');
-  // One-question fixtures use actual question objects with the normal navigation and engine.
-  async function fixture(subject,type){
-    await page.goto(base);await page.waitForSelector('.subject');
-    await page.evaluate(({subject,type})=>{const m=REVIEWER.modules.find(m=>m.subject===subject);const q=m.topics.flatMap(t=>t.questions).find(q=>q.type===type);m.topics=[{id:'test',title:'Test topic',icon:'question',questions:[q]}];},{subject,type});
-    await page.locator(`.subject[data-subject="${subject}"]`).click();await page.locator('.topic').click();
-  }
-  for(const subject of ['english','filipino'])for(const type of ['mc','tf','build']){
-    await fixture(subject,type);
-    if(type==='mc')await page.locator('.choice').first().click();
-    else if(type==='tf')await page.locator('.choice').first().click();
-    else {await page.locator('.tiles .tile').first().click();await page.locator('.check-btn').click();}
-    assert.equal(await page.locator('.feedback').count(),1);await page.locator('.next-btn').click();assert.equal(await page.locator('.result').count(),1);
-  }
-  await fixture('math','input');await page.fill('#written-answer','99999');await page.locator('.check-btn').click();assert.equal(await page.locator('.feedback.bad').count(),1);await page.locator('.next-btn').click();assert.equal(await page.locator('.score').innerText(),'0%');
-  await fixture('cl','tf');
-  const ans=await page.evaluate(()=>REVIEWER.modules.find(m=>m.subject==='cl').topics[0].questions[0].answer);
-  await page.locator(`.choice[data-k="${!ans}"]`).click();assert.equal(await page.locator('.feedback.bad').count(),1);
-  await fixture('cl','reflect');await page.locator('.draw-details summary').click();
-  const box=await page.locator('canvas.drawing').boundingBox();await page.mouse.move(box.x+20,box.y+30);await page.mouse.down();await page.mouse.move(box.x+100,box.y+80);await page.mouse.up();
-  assert(!(await page.locator('.check-btn').isDisabled()));await page.locator('.clear-drawing').click();assert(await page.locator('.check-btn').isDisabled());
-  await page.fill('#reflection','Thank you for my family because they care for me.');await page.locator('.check-btn').click();await page.locator('.next-btn').click();assert.equal(await page.locator('.score').innerText(),'🌟');
-  assert(!(await page.locator('.result').innerText()).includes('0 / 0'));
-  // Mobile width and dark mode.
-  await page.setViewportSize({width:320,height:740});await page.emulateMedia({colorScheme:'dark'});
-  await page.goto(base);await page.waitForSelector('.subject');assert(!(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1)));
-  await page.screenshot({path:path.join(out,'home-dark-small.png'),fullPage:true});
-  assert.deepEqual(errors,[]);
-  console.log(`PASS: ${passed} new question/activity correct paths; ${wrong} wrong AP answers; translation gating; mock coverage; wrong written/TF answers; retry; drawing; English/Filipino compatibility; mobile overflow and dark mode.`);
-  await context.close();if(!process.env.CDP_URL)await browser.close();else browser.close();
+      check(document.querySelector(q.type==='reflect'?'.feedback.neutral':'.feedback.ok'),'Correct answer rejected '+id);
+      if(subject==='ap'){
+       check(document.querySelector('.translation-panel')&&!document.querySelector('.translation-lock'),'Missing unlock '+id);
+       const word=document.querySelector('.translate-word');check(word,'Missing word help '+id);word.click();check(document.querySelector('.word-meaning').textContent.includes('→'),'Word not translated');
+      }
+      check(document.documentElement.scrollWidth<=innerWidth+1,'Overflow '+id);document.querySelector('.next-btn').click();count++;
+     }
+     check(['100%','🌟'].includes(document.querySelector('.score').textContent),'Wrong score');document.querySelector('.home').click();
+    }t.questions=original;
+   }return count;
+  },module.subject);console.log(`PASS all correct paths: ${module.subject} ${count}`);
+ }
+ for(const module of banks){
+  await home();await page.evaluate(()=>localStorage.clear());const ids=[];
+  for(let round=0;round<2;round++){
+   if(round)await home();await page.locator(`.subject[data-subject="${module.subject}"]`).click();await page.locator('.topic').first().click();assert.equal(await page.locator('.pill').innerText(),'1 / 10');
+   for(let i=0;i<10;i++){
+    ids.push(await page.locator('[data-question-id]').getAttribute('data-question-id'));
+    if(await page.locator('.choice').count())await page.locator('.choice').first().click();else if(await page.locator('.tiles').count()){await page.locator('.tiles .tile').first().click();await page.locator('.check-btn').click();}else{await page.fill('#written-answer','0');await page.locator('.check-btn').click();}await page.locator('.next-btn').click();
+   }
+  }assert.equal(new Set(ids).size,20,'Rotation failed '+module.subject);
+ }
+ async function fixture(subject,predicate){
+  await home();const q=banks.find(m=>m.subject===subject).topics.flatMap(t=>t.questions).find(predicate);assert(q);
+  await page.evaluate(({subject,q})=>{REVIEWER.modules.find(m=>m.subject===subject).topics=[{id:'test',title:'Test topic',icon:'question',questions:[q]}];},{subject,q});
+  await page.locator(`.subject[data-subject="${subject}"]`).click();await page.locator('.topic').click();return q;
+ }
+ const positions=new Set(),sets=new Set(),q=await fixture('english',q=>q.type==='mc'&&q.choices.length>6),answer=q.choices[q.answer];
+ for(let i=0;i<12;i++){
+  const labels=await page.locator('.choice > span:last-child').allTextContents();positions.add(labels.indexOf(answer));sets.add(JSON.stringify([...labels].sort()));
+  await page.locator('.choice').nth(labels.findIndex(t=>t!==answer)).click();assert.equal(await page.locator('.feedback.bad').count(),1);await page.locator('.next-btn').click();assert.equal(await page.locator('.score').innerText(),'0%');await page.locator('.retry').click();
+ }assert(positions.size>1);assert(sets.size>1);
+ const labels=await page.locator('.choice > span:last-child').allTextContents();await page.locator('.choice').nth(labels.indexOf(answer)).click();assert.equal(await page.locator('.feedback.ok').count(),1);
+ await fixture('ap',q=>q.type==='mc');assert.equal(await page.locator('.translate-word').count(),0);await page.locator('.choice').first().click();await page.locator('.translate-word').first().click();await page.locator('.translation-panel summary').click();await page.screenshot({path:path.join(out,'sep10-ap-translation.png'),fullPage:true});
+ await fixture('math',q=>q.visual?.kind==='line');assert.equal(await page.locator('.animal-line small').filter({hasText:/^\d+$/}).count(),0);await page.screenshot({path:path.join(out,'sep10-animals.png'),fullPage:true});
+ await page.setViewportSize({width:320,height:740});assert(!(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1)));await page.locator('.animal-line').evaluate(el=>el.scrollLeft=el.scrollWidth);assert((await page.locator('.animal-line').evaluate(el=>el.scrollLeft))>0);
+ for(const [subject,kind] of [['math','blocks'],['science','ruler']]){await fixture(subject,q=>q.visual?.kind===kind);await page.screenshot({path:path.join(out,`sep10-${kind}.png`),fullPage:true});}
+ await fixture('ap',q=>q.type==='place');await page.screenshot({path:path.join(out,'sep10-map-placement.png'),fullPage:true});assert.equal((await page.locator('.map-cell small').allTextContents()).filter(Boolean).join(),'Gitna');
+ await fixture('cl',q=>q.type==='reflect');assert(await page.locator('.check-btn').isDisabled());await page.locator('.draw-details summary').click();const box=await page.locator('canvas').boundingBox();await page.mouse.move(box.x+20,box.y+20);await page.mouse.down();await page.mouse.move(box.x+70,box.y+60);await page.mouse.up();assert(!(await page.locator('.check-btn').isDisabled()));await page.locator('.clear-drawing').click();assert(await page.locator('.check-btn').isDisabled());await page.fill('textarea','Thank you for my family.');await page.locator('.check-btn').click();await page.locator('.next-btn').click();assert.equal(await page.locator('.score').innerText(),'🌟');
+ for(const module of banks){
+  await home();await page.locator(`.subject[data-subject="${module.subject}"]`).click();await page.locator('.exam-btn').click();
+  const covered=await page.evaluate(()=>{
+   const topics=new Set();for(let i=0;i<20;i++){
+    const id=document.querySelector('[data-question-id]').dataset.questionId,q=REVIEWER.modules.flatMap(m=>m.topics.flatMap(t=>t.questions)).find(q=>q.id===id);topics.add(id.split('/')[1]);if(q.type==='reflect')throw Error('Reflection in exam');
+    if(document.querySelector('.choice'))document.querySelector('.choice').click();
+    else if(q.type==='input'){const el=document.querySelector('input');el.value='9999';el.dispatchEvent(new Event('input'));document.querySelector('.check-btn').click();}
+    else if(q.type==='build'){document.querySelector('.tile').click();document.querySelector('.check-btn').click();}
+    else if(q.type==='place'){q.pieces.forEach((p,i)=>{document.querySelector(`[data-piece="${i}"]`).click();document.querySelector(`[data-dir="${p.at}"]`).click();});document.querySelector('.check-btn').click();}
+    document.querySelector('.next-btn').click();
+   }return topics.size;
+  });assert.equal(covered,module.topics.filter(t=>t.questions.some(q=>q.type!=='reflect')).length);
+ }
+ await page.emulateMedia({colorScheme:'dark'});await home();await page.screenshot({path:path.join(out,'sep10-dark-phone.png'),fullPage:true});assert.deepEqual(errors,[]);
+ console.log('PASS: 1219 correct paths; persistent ten-question rotation in all subjects; randomized retries/options; AP gating; unlabelled animals/blocks/maps; drawing; mobile; mock topic coverage.');
+ await context.close();await browser.close();
 })().catch(e=>{console.error(e);process.exit(1);});

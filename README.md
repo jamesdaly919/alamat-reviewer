@@ -4,7 +4,7 @@ Interactive Grade 2 practice in English, Filipino, Christian Living, Araling Pan
 
 ## Study modes
 
-- Choose a subject and topic. Pick a 10-question round or all questions in that topic.
+- Choose a subject and topic for a 10-question quest. Previously unselected questions are drawn first; rotation history persists on this device.
 - Each subject has a 20-question mock exam spread across all scored topics.
 - Multiple choice, true/false, numerical entry, ordered tiles and map placement give immediate explanations.
 - **Practise my mistakes** revisits missed questions without replacing topic best scores.
@@ -12,7 +12,7 @@ Interactive Grade 2 practice in English, Filipino, Christian Living, Araling Pan
 - AP English help is absent from the question UI until an answer is submitted. Afterwards, underlined words become tappable and a full English explanation is available. The next question starts locked again. This is a study aid, not a secure exam: the static bank is available in page source.
 - Best scores remain in the existing `alamat-reviewer` localStorage key on that device/browser. Drawings and written reflections stay in the current activity; they are not uploaded or retained after navigation.
 
-The September expansion adds **235 questions and activities**: CL 46, AP 46, Math 83, Science 60. Existing English and Filipino banks are retained. See [SOURCE_NOTES.md](SOURCE_NOTES.md) for coverage and editorial decisions.
+The September 10 update contains **1,219 questions and activities across 38 topics**: English 305, Filipino 213, CL 126, AP 152, Math 233, Science 190. Every topic has at least 20 items. Multiple-choice positions are shuffled each round and retry; reviewed wrong-answer pools supply 3–4 choices where the task allows it. Genuine two-way distinctions such as a/an remain binary, and true/false button positions also shuffle. See [SOURCE_NOTES.md](SOURCE_NOTES.md) for coverage and editorial decisions.
 
 ## Run, check and deploy
 
@@ -36,7 +36,10 @@ Vercel serves this repo directly with preset **Other**. Pushes to the linked pro
 | `styles.css` | Responsive light/dark interface |
 | `data/manifest.js` | Subject loading order |
 | `data/activities.js` | Diagrams, map placement, drawing and AP help |
-| `data/*-1t.js` | Subject banks |
+| `data/*-1t.js` | Source-based subject banks |
+| `data/expansion.js`, `data/fact-expansion.js` | Reviewed extra questions and scenarios |
+| `data/option-pools.js` | Additional reviewed distractors and AP vocabulary |
+| `data/practice.js` | Rotation, option sampling and shuffling |
 | `data/illustrations.js` | Existing SVG pictures |
 | `tests/content.cjs` | Content invariants, school-key checks, arithmetic and rulers |
 | `tests/browser.cjs` | Answer paths, translation gating, scoring and layouts |

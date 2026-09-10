@@ -180,8 +180,8 @@ canvas.confetti { position: fixed; inset: 0; pointer-events: none; z-index: 9; }
 .money-pile { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; }
 .play-money { display:grid; border:2px dashed #318b53; border-radius:8px; padding:8px 15px; background:#e2f4d4; color:#204c32; text-align:center; font-size:24px; }
 .play-money small { font-size:8px; letter-spacing:1px; }
-.animal-line { display:flex; flex-wrap:wrap; gap:6px; padding-top:8px; }
-.animal-line>span { display:grid; justify-items:center; min-width:55px; flex:1; border:1px solid var(--line); background:var(--surface); border-radius:9px; padding:5px 2px; }
+.animal-line { display:flex; flex-wrap:nowrap; overflow-x:auto; gap:10px; padding:8px 0 12px; }
+.animal-line>span { display:grid; justify-items:center; min-width:55px; flex:0 0 55px; border:1px solid var(--line); background:var(--surface); border-radius:9px; padding:5px 2px; }
 .animal-line b { font-size:26px; } .animal-line small { font-size:11px; }
 .input-form { margin-top:20px; } .input-form label, label[for="reflection"] { display:block; font-size:14px; font-weight:800; margin:10px 0; }
 .input-form input, #reflection { width:100%; min-height:56px; padding:12px; border:2px solid var(--line); border-radius:12px; background:var(--surface); color:var(--ink); font:inherit; }

@@ -20,7 +20,7 @@
     ]},
     {id:'classify',title:'Sorting detectives',emoji:'🧺',intro:'Use the rule in the question. Things in a group share the named feature.',questions:[
       mc('Which skill groups objects by their similarities?',['Classifying','Inferring','Measuring','Predicting'],0,'Classifying means sorting things into groups using a shared feature.'),
-      mc('The rule is YELLOW fruit. Which group follows it?',['Yellow banana, yellow lemon, yellow mango','Red apple, red cherry, red strawberry','Purple grape, blueberry, purple plum'],0,'Every fruit in the first group is described as yellow.',{emoji:'🍌'}),
+      mc('The rule is YELLOW fruit. Which group follows it?',['Yellow banana, yellow lemon, yellow mango','Red apple, red cherry, red strawberry','Purple grape, blueberry, purple plum'],0,'The banana, lemon and mango in the correct group are all described as yellow.',{emoji:'🍌'}),
       mc('Which animal does NOT belong in this group of common farm animals?',['Chicken','Cow','Elephant','Sheep'],2,'Chickens, cows and sheep are commonly raised on farms. An elephant does not fit this group.',{emoji:'🐘'}),
       mc('Sort by SHAPE. Which object belongs with a round coin?',['A round button','A square tile','A triangular flag'],0,'The coin and button share a round shape.',{emoji:'🪙'}),
       mc('Sort by TEXTURE. Which belongs with a smooth marble?',['Rough sandpaper','A smooth glass bead','A prickly seed pod'],1,'The marble and glass bead are both described as smooth.',{emoji:'🔮'}),
@@ -42,11 +42,11 @@
     ]},
     {id:'properties',title:'Materials & their properties',emoji:'🧸',intro:'A property tells what a material is like. Choose a material whose properties fit the job.',questions:[
       mc('A ball feels smooth when touched. Which property is described?',['Color','Shape','Size','Texture'],3,'Texture describes how a surface feels, such as smooth or rough.',{emoji:'🏀'}),
-      mc('Which is best for wiping up water from a table?',['Sandpaper','Soft absorbent cloth','Rock','Metal ruler'],1,'An absorbent cloth soaks up the water. The other choices are poor tools for wiping up a spill.',{emoji:'💦'}),
+      mc('Which is best for wiping up water from a table?',['Sandpaper','Cotton cleaning cloth','Rock','Metal ruler'],1,'An absorbent cloth soaks up the water. The other choices are poor tools for wiping up a spill.',{emoji:'💦'}),
       mc('Which material is suitable for filling a soft pillow?',['Cotton','Glass','Metal','Stone'],0,'Cotton is soft and comfortable. Glass, metal and stone are hard.',{emoji:'🛏️'}),
       mc('“The toy is blue.” Which property is described?',['Texture','Color','Shape','Length'],1,'Blue is a color.',{emoji:'🔵'}),
       mc('“The block is a cube.” Which property is described?',['Shape','Smell','Color','Texture'],0,'Cube names a three-dimensional shape.',{emoji:'🧊'}),
-      mc('Which described material would feel rough?',['Smooth glass','Rough sandpaper','Soft cotton'],1,'Sandpaper has a rough surface. Read the texture words in the choices.',{emoji:'🖐️'}),
+      mc('Which material normally has a rough surface?',['Glass windowpane','Sandpaper','Cotton wool'],1,'Sandpaper has small abrasive grains that make its surface feel rough.',{emoji:'🖐️'}),
       mc('Which material is most suitable for a hard, sturdy spoon?',['Loose cotton','Water','Metal'],2,'Metal is solid and sturdy enough to form a spoon.',{emoji:'🥄'}),
       mc('Two balls have the same color, but one is large and one is small. Which property is different?',['Color','Size','Both must have different smells'],1,'Large and small describe size. The question says the colors match.',{emoji:'⚽'}),
     ]},

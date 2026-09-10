@@ -3,7 +3,7 @@
 (function () {
   'use strict';
 
-  const REVIEWER = window.REVIEWER = { modules: [], register(m) { m.topics.forEach(t => t.questions.forEach((q, i) => { q.id = `${m.id}/${t.id}/${i + 1}`; })); this.modules.push(m); } };
+  const REVIEWER = window.REVIEWER = { modules: [], register(m) { if(window.REVIEWER_EXPAND) window.REVIEWER_EXPAND(m); m.topics.forEach(t => t.questions.forEach((q, i) => { q.id = `${m.id}/${t.id}/${i + 1}`; })); this.modules.push(m); } };
   const SUBJECTS = {
     english:  { label: 'English',  letter: 'E', lang: 'en-US', ui: { correct: 'Correct!', wrong: 'Not quite.', next: 'Next', finish: 'See my score', check: 'Check', hint: 'Tap the tiles in order', tf: ['True', 'False'], read: 'Read to me', mc: 'Multiple choice', tfl: 'True or false', build: 'Build it', practice: 'Practice', exam: 'Mock exam', qs: 'questions' } },
     filipino: { label: 'Filipino', letter: 'F', lang: 'fil-PH', ui: { correct: 'Tama!', wrong: 'Hindi tama.', next: 'Susunod', finish: 'Tingnan ang iskor', check: 'Suriin', hint: 'Pindutin ang mga tile sa tamang ayos', tf: ['Tama', 'Mali'], read: 'Basahin', mc: 'Pagpipilian', tfl: 'Tama o Mali', build: 'Buuin', practice: 'Pagsasanay', exam: 'Pagsubok', qs: 'tanong' } },
@@ -96,7 +96,7 @@
     app.innerHTML = `
       <section class="screen">
         <div class="topbar"><button class="back" aria-label="Back">‹</button><div class="title">${esc(m.title)} <span style="color:var(--ink-2);font-weight:500">· ${esc(m.subtitle || '')}</span></div></div>
-        <div class="session-options"><label for="round-size">Round length</label><select id="round-size"><option value="10">10 questions · quick quest</option><option value="all">All questions · full topic</option></select></div>
+        <p class="session-options">10 questions per quest · New questions first · Answer choices shuffled</p>
         <div class="topics">
           ${m.topics.map((t, i) => {
             const best = store.best(topicKey(m, t));
@@ -109,14 +109,20 @@
         <button class="exam-btn" data-subject="${m.subject}">🎯 ${s.ui.exam} · ${Math.min(EXAM_SIZE, m.topics.reduce((a, t) => a + t.questions.length, 0))} ${s.ui.qs}</button>
       </section>`;
     app.querySelector('.back').onclick = () => { state = { screen: 'home' }; render(); };
-    app.querySelectorAll('.topic').forEach(b => b.onclick = () => startQuiz(m, m.topics[+b.dataset.i], app.querySelector('#round-size').value));
+    app.querySelectorAll('.topic').forEach(b => b.onclick = () => startQuiz(m, m.topics[+b.dataset.i]));
     app.querySelector('.exam-btn').onclick = () => startQuiz(m, null);
   }
 
   function startQuiz(mod, topic, size = '10', retry = null) {
     let qs;
     if (retry) qs = shuffle(retry).map(a => ({ q: a.q, topic: a.topic }));
-    else if (topic) qs = shuffle(topic.questions).slice(0, size === 'all' ? topic.questions.length : PRACTICE_SIZE).map(q => ({ q, topic }));
+    else if (topic) {
+      const key = 'alamat-rotation/' + topicKey(mod, topic);
+      let seen=[]; try { seen=JSON.parse(localStorage.getItem(key)||'[]'); if(!Array.isArray(seen))seen=[]; } catch(e) {}
+      const round=window.REVIEWER_PRACTICE.draw(topic.questions,PRACTICE_SIZE,seen);
+      try { localStorage.setItem(key,JSON.stringify(round.seen)); } catch(e) {}
+      qs=round.questions.map(q=>({q,topic}));
+    }
     else {
       // Round-robin sampling guarantees every scored topic is represented.
       const pools = shuffle(mod.topics).map(t => shuffle(t.questions.filter(q => q.type !== 'reflect')).map(q => ({ q, topic: t })));
@@ -126,6 +132,7 @@
       }
       qs = shuffle(qs);
     }
+    qs=qs.map(it=>({...it,q:window.REVIEWER_PRACTICE.prepare(it.q)}));
     state = { screen: 'quiz', mod, topic, size, retry: !!retry, items: qs, i: 0, answers: [], streak: 0, bestStreak: 0 };
     render();
   }
@@ -139,7 +146,7 @@
     if (q.type === 'mc') {
       body = `<div class="choices">${q.choices.map((c, k) => `<button class="choice" data-k="${k}"><span class="key">${String.fromCharCode(65 + k)}</span><span>${rich(c)}</span></button>`).join('')}</div>`;
     } else if (q.type === 'tf') {
-      body = `<div class="choices tf"><button class="choice" data-k="true">✅ ${ui.tf[0]}</button><button class="choice" data-k="false">❌ ${ui.tf[1]}</button></div>`;
+      body = `<div class="choices tf">${q.order.map(v=>`<button class="choice" data-k="${v}">${v?"✅":"❌"} ${ui.tf[v?0:1]}</button>`).join('')}</div>`;
     } else if (q.type === 'input') {
       body = `<form class="input-form"><label for="written-answer">${esc(q.inputLabel || 'Your answer')}</label><input id="written-answer" autocomplete="off" inputmode="${q.numeric ? 'numeric' : 'text'}" maxlength="120"><button class="check-btn" disabled>${ui.check}</button></form>`;
     } else if (q.type === 'place') {
@@ -159,7 +166,7 @@
         ${showIntro ? `<div class="intro"><span class="bulb">💡</span><span>${esc(topic.intro)}</span></div>` : ''}
         <div class="card" data-question-id="${esc(q.id)}">
           <div class="qhead">
-            ${art(q) ? `<div class="qart">${art(q)}</div>` : ''}
+            <div class="qart" aria-hidden="true"><span>${q.type==='reflect'?'🎨':s.letter}</span></div>
             <div style="flex:1;min-width:0">
               <span class="qtype">${typeLabel}${!topic ? ' · ' + esc(it.topic.title) : ''}</span>
               ${q.passage ? `<div class="passage">${rich(q.passage)}</div>` : ''}
@@ -304,5 +311,5 @@
     list.forEach(src => { const s = document.createElement('script'); s.src = src; s.onload = s.onerror = () => { if (++n === list.length) done(); }; document.head.appendChild(s); });
   }
   if (window.REVIEWER_BUNDLED) { document.addEventListener('DOMContentLoaded', boot); if (document.readyState !== 'loading') boot(); }
-  else loadScripts(['data/illustrations.js', 'data/activities.js', 'data/manifest.js'], () => loadScripts(window.REVIEWER_MANIFEST || [], boot));
+  else loadScripts(['data/illustrations.js', 'data/activities.js', 'data/practice.js', 'data/expansion.js', 'data/fact-expansion.js', 'data/option-pools.js', 'data/manifest.js'], () => loadScripts(window.REVIEWER_MANIFEST || [], boot));
 })();

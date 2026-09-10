@@ -29,4 +29,16 @@ The source folder was `alamat reviewer 09042026`, with CL, AP, Math, Science and
 
 `tests/content.cjs` checks answer indices, unique options, feasible tiles, map positions, bilingual explanations, arithmetic and ruler lengths. Independent school-key checks include 426, 70, 647, 433, 57, the tens value in 435 and Lara’s 18th birthday.
 
-`tests/browser.cjs` exercises all 235 new items through the normal UI, correct/incorrect answers, AP gating, mock coverage, unscored responses, drawing/clear, retry and existing English/Filipino modes. Screenshot checks cover phone layouts and dark mode. Original student worksheets/photos are not published.
+`tests/browser.cjs` exercises all 1,219 items through the normal UI, correct/incorrect answers, AP gating, mock coverage, unscored responses, drawing/clear, retry and existing English/Filipino modes. Screenshot checks cover phone layouts and dark mode. Original student worksheets/photos are not published.
+
+## September 10 question audit
+
+- Reviewed the existing six-subject banks and new templates for missing context, multiple valid answers, explanation errors, and visual answer cues. Fresh variants are practice for the listed class skills, not additional claimed worksheet transcriptions.
+- Removed animal position numbers and displayed block totals. Animals stay in one scrollable left-to-right line. Map-placement cells no longer print the answer directions. Ruler labels are enlarged for phones.
+- Scored question headers now use neutral subject icons. Actual evidence diagrams remain; decorative pictures no longer reveal which word or object to choose.
+- Corrected the unnamed Green Garden proper-noun assumption, Miguel’s unspecified role, animal pronouns, a plural question with two valid sentences, and adjective questions that accepted subjective judgments as a single answer. Complete subject/predicate tasks explicitly request the complete phrase.
+- Corrected silent-e and diphthong explanations, the bumbero vowel, missing story/image references, and explanations that referred to a fixed answer position. Constrained sentence-tile tasks where modifiers could otherwise move; accepted either parent order in the Filipino family list.
+- Added varied vowel/syllable counts, reviewed rhyme distractors, exact arithmetic and ordinal variants. AP caring actions use concrete responses instead of overlapping values as competing answers. Classification pools avoid treating length and size as mutually exclusive.
+- Every topic has at least 20 items. Practice draws ten and prioritizes the remaining bank; mock exams still contain twenty items covering all scored topics. Correct answers remain attached to their text when options shuffle. Retry retains the entire wrong-answer pool.
+- AP vocabulary help and complete English explanations remain locked until submission, including new questions and wrong-answer feedback. Open writing/drawing stays unscored.
+- Content checks exercise 160 repeated preparations per multiple-choice item, verify source-key answers and diagram arithmetic, and check bank/round sizes. Browser checks cover all correct answers, normal persistent rotation, wrong-answer retries, changing option sets, AP gating, drawing, mobile overflow and mock coverage. These checks supplement editorial review; they do not prove that every possible interpretation is unambiguous.

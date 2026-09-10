@@ -55,7 +55,7 @@
       input('Count by 20s: 120, 140, 160, ______',180,'160 + 20 = 180.'),
       mc('The rule is “start at 50 and add 10.” Which number breaks the pattern: 50, 60, 70, 85, 90?',[60,70,85,90],2,'After 70, adding 10 should give 80, not 85.'),
       input('When counting by 2s, what comes after 12?',14,'12 + 2 = 14.'),
-      mc('Which list counts by 50s?',['50, 100, 150, 200','50, 100, 105, 150','50, 100, 150, 175','50, 110, 150, 200'],0,'Each number in the first list is 50 more than the one before it.'),
+      mc('Which list counts by 50s?',['50, 100, 150, 200','50, 100, 105, 150','50, 100, 150, 175','50, 110, 150, 200'],0,'In 50, 100, 150, 200, each number is 50 more than the one before it.'),
       input('Count by 10s: 60, 70, 80, ______, 100',90,'80 + 10 = 90, and 90 + 10 = 100.'),
       mc('I am greater than 15 but less than 25. You say me when counting from 0 by 5s and by 10s. What am I?',[10,20,30,40],1,'20 lies between 15 and 25 and belongs to both counting patterns.'),
       mc('There are 4 packs with 10 eggs in each pack. Which list counts the totals after each pack?',['10, 15, 20, 24','10, 20, 30, 40','10, 12, 14, 16','10, 20, 40, 60'],1,'Add 10 eggs per pack. Four packs give 40 eggs.'),
