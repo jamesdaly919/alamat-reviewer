@@ -170,11 +170,12 @@
             <div style="flex:1;min-width:0">
               <span class="qtype">${typeLabel}${!topic ? ' · ' + esc(it.topic.title) : ''}</span>
               ${q.passage ? `<div class="passage">${rich(q.passage)}</div>` : ''}
-              <p class="qtext">${rich(q.q)}</p>
+              <p class="qtext">${rich(q.calculation&&/^(Find the sum:|What is \d+ \+ \d+\?)/.test(q.q)?'Find the sum.':q.q)}</p>
               <button class="speak">🔊 ${ui.read}</button>
             </div>
           </div>
           ${q.visual ? window.REVIEWER_ACTIVITIES.visual(q.visual) : ''}
+          ${mod.subject==='math'?window.REVIEWER_ACTIVITIES.worksheetHTML(q):''}
           ${body}
           ${mod.subject === 'ap' ? '<p class="translation-lock">🔒 English help unlocks after you try.</p>' : ''}
           <div class="fb-slot" aria-live="polite"></div>
@@ -184,6 +185,7 @@
     app.querySelector('.back').onclick = () => { if (confirm('Quit this quiz?')) { state = { screen: 'topics', mod }; render(); } };
     app.querySelector('.speak').onclick = () => speak((q.passage ? q.passage + '. ' : '') + q.q + (q.type === 'mc' ? '. ' + q.choices.join('. ') : ''), s.lang);
 
+    if(mod.subject==='math')window.REVIEWER_ACTIVITIES.bindWorksheet(app,q);
     if (q.type === 'mc') {
       app.querySelectorAll('.choice').forEach(b => b.onclick = () => {
         const k = +b.dataset.k, ok = k === q.answer;

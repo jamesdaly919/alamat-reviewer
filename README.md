@@ -7,6 +7,7 @@ Interactive Grade 2 practice in English, Filipino, Christian Living, Araling Pan
 - Choose a subject and topic for a 10-question quest. Previously unselected questions are drawn first; rotation history persists on this device.
 - Each subject has a 20-question mock exam spread across all scored topics.
 - Multiple choice, true/false, numerical entry, ordered tiles and map placement give immediate explanations.
+- Math sums use vertically aligned numbers. **Open my worksheet** provides scratch paper with the problem, finger/pen/mouse writing, Undo, Clear and optional typed notes. Work stays when reopening the same question and resets on the next question.
 - **Practise my mistakes** revisits missed questions without replacing topic best scores.
 - CL/AP writing and drawing have examples and a guide for a grown-up’s review. Many answers are possible; these activities are unscored and excluded from mock exams.
 - AP English help is absent from the question UI until an answer is submitted. Afterwards, underlined words become tappable and a full English explanation is available. The next question starts locked again. This is a study aid, not a secure exam: the static bank is available in page source.
@@ -19,6 +20,7 @@ The September 10 update contains **1,219 questions and activities across 38 topi
 ```sh
 python -m http.server 8123
 node tests/content.cjs
+node tests/worksheet.cjs
 python build.py
 ```
 

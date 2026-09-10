@@ -66,5 +66,46 @@
     });
     if(!seen.size)panel.querySelector('p').textContent='Open the English explanation below.';
   }
-  window.REVIEWER_ACTIVITIES={visual,placeHTML,bindPlace,reflectHTML,bindReflect,unlockAP};
+  function sumHTML(values) {
+    const width=Math.max(...values.map(n=>String(n).length));
+    return `<pre class="vertical-sum" role="img" aria-label="${esc(values.join(' plus '))}">${String(values[0]).padStart(width+2)}\n+ ${String(values[1]).padStart(width)}<span class="sum-rule" aria-hidden="true"></span></pre>`;
+  }
+  function worksheetHTML(q) {
+    return `${q.calculation?sumHTML(q.calculation):''}<button type="button" class="worksheet-open">✏️ Open my worksheet</button>
+      <dialog class="worksheet-dialog" aria-labelledby="worksheet-title"><h2 id="worksheet-title">My scratch worksheet</h2><p>Write with your finger, pen or mouse. Work it out here, then enter your answer.</p>
+      <canvas class="scratch-canvas" width="600" height="480" aria-label="Scratch paper for working out this question. You can type notes below instead."></canvas>
+      <div class="worksheet-tools"><button type="button" class="scratch-undo">↶ Undo</button><button type="button" class="scratch-clear">Clear writing</button></div>
+      <details><summary>⌨️ Type notes instead</summary><label for="scratch-notes">My working notes</label><textarea id="scratch-notes" rows="2" maxlength="2000"></textarea></details>
+      <button type="button" class="worksheet-close" autofocus>Back to my answer</button></dialog>`;
+  }
+  function bindWorksheet(app,q) {
+    const dialog=app.querySelector('.worksheet-dialog'),canvas=dialog.querySelector('canvas'),ctx=canvas.getContext('2d');
+    const strokes=[];let active=null;
+    const redraw=()=>{
+      ctx.lineCap='butt';ctx.lineJoin='miter';ctx.clearRect(0,0,600,480);ctx.fillStyle='#fff';ctx.fillRect(0,0,600,480);
+      ctx.strokeStyle='#e4eaf1';ctx.lineWidth=1;
+      for(let x=20;x<600;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,480);ctx.stroke();}
+      for(let y=20;y<480;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(600,y);ctx.stroke();}
+      if(q.calculation){
+        ctx.fillStyle='#243548';ctx.font='38px monospace';ctx.textAlign='center';
+        q.calculation.forEach((n,row)=>[...String(n)].reverse().forEach((digit,i)=>ctx.fillText(digit,340-i*40,96+row*60)));
+        const width=Math.max(...q.calculation.map(n=>String(n).length));ctx.fillText('+',340-width*40,156);
+        ctx.strokeStyle='#243548';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(320-width*40,174);ctx.lineTo(365,174);ctx.stroke();
+      }
+      ctx.strokeStyle='#2054a0';ctx.fillStyle='#2054a0';ctx.lineWidth=5;ctx.lineCap='round';ctx.lineJoin='round';
+      for(const points of strokes){ctx.beginPath();ctx.arc(points[0][0],points[0][1],1.5,0,2*Math.PI);ctx.fill();ctx.beginPath();ctx.moveTo(...points[0]);points.slice(1).forEach(p=>ctx.lineTo(...p));ctx.stroke();}
+      dialog.querySelector('.scratch-undo').disabled=!strokes.length;
+    };
+    const point=e=>{const r=canvas.getBoundingClientRect();return [(e.clientX-r.left)*600/r.width,(e.clientY-r.top)*480/r.height];};
+    canvas.onpointerdown=e=>{if(active!==null)return;e.preventDefault();active=e.pointerId;canvas.setPointerCapture(active);strokes.push([point(e)]);redraw();};
+    canvas.onpointermove=e=>{if(e.pointerId!==active)return;strokes[strokes.length-1].push(point(e));redraw();};
+    canvas.onpointerup=canvas.onpointercancel=canvas.onlostpointercapture=e=>{if(e.pointerId===active)active=null;};
+    dialog.querySelector('.scratch-undo').onclick=()=>{strokes.pop();redraw();};
+    dialog.querySelector('.scratch-clear').onclick=()=>{strokes.length=0;dialog.querySelector('textarea').value='';redraw();};
+    app.querySelector('.worksheet-open').onclick=()=>dialog.showModal();
+    dialog.querySelector('.worksheet-close').onclick=()=>dialog.close();
+    dialog.onclose=()=>{active=null;const answer=app.querySelector('#written-answer:not(:disabled),.choice:not(:disabled)');(answer||app.querySelector('.worksheet-open'))?.focus();};
+    redraw();
+  }
+  window.REVIEWER_ACTIVITIES={visual,placeHTML,bindPlace,reflectHTML,bindReflect,unlockAP,sumHTML,worksheetHTML,bindWorksheet};
 })();

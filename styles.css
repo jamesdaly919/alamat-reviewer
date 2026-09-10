@@ -183,6 +183,20 @@ canvas.confetti { position: fixed; inset: 0; pointer-events: none; z-index: 9; }
 .animal-line { display:flex; flex-wrap:nowrap; overflow-x:auto; gap:10px; padding:8px 0 12px; }
 .animal-line>span { display:grid; justify-items:center; min-width:55px; flex:0 0 55px; border:1px solid var(--line); background:var(--surface); border-radius:9px; padding:5px 2px; }
 .animal-line b { font-size:26px; } .animal-line small { font-size:11px; }
+.vertical-sum { width:max-content; margin:20px auto; color:var(--ink); font:700 38px/1.45 monospace; }
+.sum-rule { display:block; border-bottom:3px solid currentColor; margin-top:4px; }
+.worksheet-open, .worksheet-close, .worksheet-tools button { min-height:44px; padding:10px 16px; border:2px solid var(--line); border-radius:12px; background:var(--surface-2); color:var(--ink); font:inherit; cursor:pointer; }
+.worksheet-open { display:block; margin:16px auto; font-weight:800; }
+.worksheet-dialog { width:min(540px,calc(100vw - 24px)); max-height:90vh; max-height:90dvh; padding:18px; border:2px solid var(--line); border-radius:20px; color:var(--ink); background:var(--surface); overflow:auto; box-sizing:border-box; }
+.worksheet-dialog::backdrop { background:rgba(20,35,55,.55); }
+.worksheet-dialog h2 { margin:0 0 8px; font-size:23px; }
+.worksheet-dialog p, .worksheet-dialog summary { font-size:14px; margin:8px 0 12px; }
+.scratch-canvas { display:block; width:100%; height:auto; aspect-ratio:5/4; touch-action:none; border:1px solid var(--line); border-radius:10px; background:white; }
+.worksheet-tools { display:flex; gap:8px; margin:10px 0; flex-wrap:wrap; }
+.worksheet-tools button:disabled { opacity:.45; cursor:default; }
+.worksheet-dialog label { display:block; font-size:14px; margin:8px 0; }
+#scratch-notes { width:100%; padding:8px; background:var(--surface-2); color:var(--ink); border:1px solid var(--line); border-radius:8px; font:inherit; box-sizing:border-box; }
+.worksheet-close { width:100%; margin-top:12px; background:var(--green); color:white; font-weight:800; }
 .input-form { margin-top:20px; } .input-form label, label[for="reflection"] { display:block; font-size:14px; font-weight:800; margin:10px 0; }
 .input-form input, #reflection { width:100%; min-height:56px; padding:12px; border:2px solid var(--line); border-radius:12px; background:var(--surface); color:var(--ink); font:inherit; }
 .input-form input { font-size:24px; font-variant-numeric:tabular-nums; }

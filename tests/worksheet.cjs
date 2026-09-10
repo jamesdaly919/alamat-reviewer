@@ -1,0 +1,38 @@
+const {chromium}=require('playwright'),assert=require('node:assert/strict'),path=require('node:path');
+(async()=>{
+ const browser=process.env.CDP_URL?await chromium.connectOverCDP(process.env.CDP_URL):await chromium.launch({channel:'chrome'});
+ const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,reducedMotion:'reduce'});
+ const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(process.env.REVIEWER_URL||'http://127.0.0.1:8123');await page.waitForSelector('.subject');
+ const sums=await page.evaluate(()=>{
+  const m=REVIEWER.modules.find(m=>m.subject==='math');
+  const qs=m.topics.flatMap(t=>t.questions).filter(q=>q.type==='input'&&q.calculation).slice(0,2);
+  m.topics=[{id:'worksheet-test',title:'Find the sum',icon:'question',questions:qs}];return qs;
+ });
+ await page.locator('.subject[data-subject="math"]').click();await page.locator('.topic').click();
+ const id=await page.locator('[data-question-id]').getAttribute('data-question-id'),q=sums.find(q=>q.id===id);
+ const width=Math.max(...q.calculation.map(n=>String(n).length));
+ assert.equal(await page.locator('.vertical-sum').textContent(),String(q.calculation[0]).padStart(width+2)+'\n+ '+String(q.calculation[1]).padStart(width));
+ assert.equal(await page.locator('.worksheet-dialog').isVisible(),false);
+ await page.screenshot({path:path.resolve(__dirname,'../../source-review/worksheet-sum.png'),fullPage:true});
+ await page.locator('.worksheet-open').click();assert(await page.locator('.worksheet-dialog').isVisible());
+ const canvas=page.locator('.scratch-canvas'),pixels=()=>canvas.evaluate(c=>c.toDataURL());
+ const blank=await pixels();assert(await page.locator('.scratch-undo').isDisabled());
+ let r=await canvas.boundingBox();await page.mouse.move(r.x+50,r.y+30);await page.mouse.down();await page.mouse.move(r.x+80,r.y+60);await page.mouse.up();
+ const drawn=await pixels();assert.notEqual(drawn,blank);
+ await page.locator('.worksheet-close').click();assert(await page.locator('#written-answer').evaluate(e=>e===document.activeElement));
+ assert(await page.locator('.check-btn').isDisabled());await page.locator('.worksheet-open').click();assert((await pixels())===drawn,'Reopening must preserve strokes');
+ await page.locator('.scratch-undo').click();assert((await pixels())===blank,'Clear/undo must restore clean worksheet');
+ r=await canvas.boundingBox();await page.touchscreen.tap(r.x+70,r.y+70);assert.notEqual(await pixels(),blank);
+ await page.locator('.worksheet-dialog summary').click();await page.fill('#scratch-notes','Carry 1 ten.');
+ await page.keyboard.press('Escape');assert(!(await page.locator('.worksheet-dialog').isVisible()));
+ await page.locator('.worksheet-open').click();assert.equal(await page.locator('#scratch-notes').inputValue(),'Carry 1 ten.');
+ await page.setViewportSize({width:320,height:740});assert(!(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth)));
+ assert(!(await page.locator('.worksheet-dialog').evaluate(e=>e.scrollWidth>e.clientWidth)));
+ await page.screenshot({path:path.resolve(__dirname,'../../source-review/worksheet-open.png'),fullPage:true});
+ await page.locator('.scratch-clear').click();assert((await pixels())===blank,'Clear/undo must restore clean worksheet');assert.equal(await page.locator('#scratch-notes').inputValue(),'');
+ await page.locator('.worksheet-close').click();await page.fill('#written-answer',q.answer);await page.locator('.check-btn').click();assert.equal(await page.locator('.feedback.ok').count(),1);
+ await page.locator('.next-btn').click();await page.locator('.worksheet-open').click();assert(await page.locator('.scratch-undo').isDisabled());assert.equal(await page.locator('#scratch-notes').inputValue(),'');
+ assert.deepEqual(errors,[]);console.log('PASS vertical sums, pen/mouse/touch writing, undo/clear, reopen retention, Escape/focus, mobile layout, scoring and fresh worksheet per question.');
+ await context.close();await browser.close();
+})().catch(e=>{console.error(e);process.exit(1);});
