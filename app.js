@@ -239,7 +239,7 @@
         <div class="feedback ${ok === null ? 'neutral' : ok ? 'ok' : 'bad'}">
           <div class="face">${ok === null ? '🎨' : ok ? pick(['🎉', '⭐', '🌟', '👏', '🏆']) : '🤔'}</div>
           <div><b>${ok === null ? 'Thank you for sharing! 🌈' : ok ? ui.correct + ' ' + pick(PRAISE) : ui.wrong + ' ' + pick(ENCOURAGE)}</b>
-            ${ok === null ? `<p>One example (your words can be different): ${rich(correctText)}</p><ul>${q.rubric.map(r => `<li>${rich(r)}</li>`).join('')}</ul><p>Check these with a grown-up. This activity is not scored.</p>` : !ok ? `<p>✅ ${rich(correctText)}</p>` : ''}
+            ${ok === null ? `<p>One example (your words can be different): ${rich(correctText)}</p><ul>${q.rubric.map(r => `<li>${rich(r)}</li>`).join('')}</ul><p>Check these with a grown-up. This activity is not scored.</p>` : !ok ? `<p>${q.type==='tf'?(mod.subject==='ap'||mod.subject==='filipino'?'Tamang sagot: ':'Correct answer: '):'✅ '}${rich(correctText)}</p>` : ''}
             ${q.why ? `<p>${rich(q.why)}</p>` : ''}</div>
         </div>
         <button class="next-btn">${last ? ui.finish : ui.next + ' →'}</button>`;
@@ -313,5 +313,5 @@
     list.forEach(src => { const s = document.createElement('script'); s.src = src; s.onload = s.onerror = () => { if (++n === list.length) done(); }; document.head.appendChild(s); });
   }
   if (window.REVIEWER_BUNDLED) { document.addEventListener('DOMContentLoaded', boot); if (document.readyState !== 'loading') boot(); }
-  else loadScripts(['data/illustrations.js', 'data/activities.js', 'data/practice.js', 'data/expansion.js', 'data/fact-expansion.js', 'data/option-pools.js', 'data/manifest.js'], () => loadScripts(window.REVIEWER_MANIFEST || [], boot));
+  else loadScripts(['data/illustrations.js', 'data/activities.js', 'data/practice.js', 'data/expansion.js', 'data/fact-expansion.js', 'data/option-pools.js', 'data/true-false.js', 'data/manifest.js'], () => loadScripts(window.REVIEWER_MANIFEST || [], boot));
 })();

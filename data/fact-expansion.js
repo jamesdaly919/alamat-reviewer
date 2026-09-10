@@ -2,15 +2,14 @@
 (function(){
   window.REVIEWER_FACT_BANKS=(m,add,mc)=>{
     const s=m.subject;
+    const statement=(topic,i)=>add(s,topic,window.REVIEWER_STATEMENT(s,topic,i));
     function rows(topic,data,pool){
       data.forEach(([prompt,answer,why,en,whyEn],i)=>{
         const options=s==='science'&&topic==='classify'?pool.filter(x=>answer==='Length'?x!=='Size':x!=='Length'):pool;
         const q=mc(prompt,answer,options.filter(x=>x!==answer),why,{emoji:s==='cl'?'💭':s==='ap'?'🧭':'🔬'});
         if(s==='ap'){q.en=en;q.whyEn=whyEn;}
         add(s,topic,q);
-        // A second task checks a claim about the scenario, not a cosmetic rewording.
-        const claim=i%2?answer:options.find(x=>x!==answer);
-        add(s,topic,{type:'tf',q:prompt+`\n${s==='ap'?'Tama ba ang sagot na ito':'Is this answer correct'}: “${claim}”?`,answer:claim===answer,why,...(s==='ap'?{en:en+` Is “${claim}” the correct answer?`,whyEn}:{}),emoji:'💭'});
+        statement(topic,i);
       });
     }
     if(s==='cl'){
@@ -45,7 +44,7 @@
         ['You are asked why you help with the Kasiyana project.','To care for people in need.','The purpose is to help others, not to demand a reward.'],
       ];
       const unkind=['Demand a prize before helping.','Laugh at the person.','Make the mess bigger.','Hide the materials.','Tell the person to go away.'];
-      kindness.forEach(([scene,a,why],i)=>{add(s,'kindness',mc(scene+' What is a caring response?',a,unkind,why));add(s,'kindness',{type:'tf',q:scene+`\nIs this a caring response: “${i%2?a:unkind[i%unkind.length]}”?`,answer:!!(i%2),why,emoji:'💭'});});
+      kindness.forEach(([scene,a,why],i)=>{add(s,'kindness',mc(scene+' What is a caring response?',a,unkind,why));statement('kindness',i);});
       const care=[
         ['The tap is running while nobody uses the water.','Turn off the tap.','This avoids wasting water.'],
         ['A used sheet still has a clean blank side.','Use the blank side for practice.','Using both sides reduces paper waste.'],
@@ -56,7 +55,7 @@
         ['You leave a room and an adult asks you to switch off its unused light.','Switch off the unused light.','This avoids wasting electricity.'],
         ['You visit a park with your family. There is a sign to keep to the path.','Stay on the path to protect the plants.','Following the sign helps care for the park.'],
       ];
-      care.forEach(([scene,a,why],i)=>{add(s,'creation',mc(scene+' Which action shows care?',a,['Waste more water.','Leave rubbish behind.','Damage the plants.','Use materials carelessly.','Ignore the caring instruction.'],why));add(s,'creation',{type:'tf',q:scene+`\nWould this show care: “${i%2?a:"Damage the plants for fun."}”?`,answer:!!(i%2),why,emoji:'🌱'});});
+      care.forEach(([scene,a,why],i)=>{add(s,'creation',mc(scene+' Which action shows care?',a,['Waste more water.','Leave rubbish behind.','Damage the plants.','Use materials carelessly.','Ignore the caring instruction.'],why));statement('creation',i);});
     }
     if(s==='science'){
       rows('process',[
@@ -122,7 +121,7 @@
         ['A container has no label. You want to know what is in it.','Ask the teacher to identify it.','Do not taste or sniff unknown substances.'],
         ['A glass container breaks near your group.','Step back and tell an adult.','Broken glass can cut.'],
       ];
-      safe.forEach(([scene,a,why],i)=>{add(s,'care',mc(scene+' What should you do?',a,['Taste the material.','Rush without checking.','Hide the problem from the teacher.','Treat the tool as a toy.','Ignore the safety instructions.'],why));add(s,'care',{type:'tf',q:scene+`\nIs this safe: “${i%2?a:"Use the materials without following any safety instructions."}”?`,answer:!!(i%2),why,emoji:'🧰'});});
+      safe.forEach(([scene,a,why],i)=>{add(s,'care',mc(scene+' What should you do?',a,['Taste the material.','Rush without checking.','Hide the problem from the teacher.','Treat the tool as a toy.','Ignore the safety instructions.'],why));statement('care',i);});
     }
     if(s==='ap'){
       const places=['Paaralan','Ospital','Pamilihan','Simbahan','Pook-libangan','Pamahalaan'];
@@ -174,8 +173,7 @@
       const careless=['Magkalat pa sa paligid.','Sirain ang gamit ng iba.','Tawanan ang taong nangangailangan.','Itago ang gamit upang walang ibang makinabang.','Guluhin ang mga tumutulong.'];
       careScenes.forEach(([q,a,why,en,whyEn],i)=>{
         add(s,'care',mc(q,a,careless,why,{en,whyEn}));
-        const good=i%2===1,claim=good?a:careless[i%careless.length];
-        add(s,'care',{type:'tf',q:q+`\nMabuti bang gawin ito: “${claim}”?`,answer:good,why,en:en+' Is the proposed action helpful?',whyEn});
+        statement('care',i);
       });
     }
     if(s==='cl'||s==='ap'){

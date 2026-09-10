@@ -9,7 +9,7 @@ const context = vm.createContext({ window: {}, REVIEWER: { register: m => {
   m.topics.forEach(t=>t.questions.forEach((q,i)=>q.id=`${m.id}/${t.id}/${i+1}`));
   modules.push(m);
 } } });
-for(const f of ['practice','expansion','fact-expansion','option-pools'])vm.runInContext(fs.readFileSync(path.join(root,`data/${f}.js`),'utf8'),context);
+for(const f of ['practice','expansion','fact-expansion','option-pools','true-false'])vm.runInContext(fs.readFileSync(path.join(root,`data/${f}.js`),'utf8'),context);
 vm.runInContext('let seed=74261; Math.random=()=>((seed=(Math.imul(seed,1664525)+1013904223)>>>0)/4294967296)',context);
 vm.runInContext(fs.readFileSync(path.join(root,'data/manifest.js'),'utf8'),context);
 for (const f of context.window.REVIEWER_MANIFEST) vm.runInContext(fs.readFileSync(path.join(root,f),'utf8'),context,{filename:f});
@@ -53,7 +53,10 @@ for(const m of newModules){
         assert.equal(options.size,new Set(q.choices.concat(q.distractors||[])).size,'Retry lost an option from the pool '+label);
         assert.equal(JSON.stringify(q),before,'Canonical question mutated '+label);
       }
-      if(q.type==='tf')assert.equal(typeof q.answer,'boolean',label);
+      if(q.type==='tf'){
+        assert.equal(typeof q.answer,'boolean',label);
+        assert(!/is this|would this|is the proposed|tama ba|mabuti bang|\?\s*$|\bis correct\b/i.test(q.q),'Use a statement, not a question-and-answer wrapper: '+label);
+      }
       if(q.type==='input')assert(String(q.answer).trim(),label);
       if(q.type==='build'){
         const join=q.join===undefined?' ':q.join;
@@ -107,3 +110,16 @@ const activitySource=fs.readFileSync(path.join(root,'data/activities.js'),'utf8'
 assert(!activitySource.includes('${i+1}'),'Numbered animal labels returned');
 assert(!activitySource.includes('${v.values[i]} ${label'),'Block count labels returned');
 console.log(`PASS: ${count} items, ${diagrams} diagrams, ${generatedSums} sums; every topic >=20; rotation, sampled options, retries, visual answers and source-key checks.`);
+let rewritten=0;
+for(const [subject,topics,length] of [
+ ['cl',['baptism','jesus-prayer','kindness','creation'],8],
+ ['science',['process','classify','properties','changes'],10],
+ ['science',['care'],8],
+ ['ap',['community','institutions','helpers','care'],8],
+])for(const topic of topics){
+ const statements=Array.from({length},(_,i)=>context.window.REVIEWER_STATEMENT(subject,topic,i));
+ assert.equal(statements.filter(q=>q.answer).length,length/2,'Unbalanced authored statements '+subject+'/'+topic);
+ for(const q of statements){assert(q.q.endsWith('.'),'Statement must be a complete sentence');assert(q.why.length>20,'Explain the fact or misconception');}
+ rewritten+=length;
+}
+console.log(`PASS: ${rewritten} authored replacements with balanced truth values; ${modules.flatMap(m=>m.topics.flatMap(t=>t.questions)).filter(q=>q.type==='tf').length} total true/false statements checked.`);

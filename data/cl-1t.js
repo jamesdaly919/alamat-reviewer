@@ -13,7 +13,7 @@
       mc('Where was Jesus baptized?',['Red Sea','Sea of Galilee','Jordan River'],2,'The class review names the Jordan River.','🏞️'),
       mc('In your class review, what response follows “I baptize you in the name of the Father, and of the Son, and of the Holy Spirit”?',['Amen','Alleluia','And with your spirit'],0,'The response taught in your review is “Amen.”','🙏'),
       tf('We receive God’s grace during Baptism.',true,'Baptism gives us God’s grace and welcomes us into the Church.','💧'),
-      tf('Baptism is important because it helps us win games.',false,'Baptism is about grace, new life and belonging to the Church, not winning games.','⛪'),
+      tf('Baptism and Confirmation are two names for the same sacrament.',false,'Baptism and Confirmation are different sacraments. Baptism begins our life as members of the Church.','⛪'),
       tf('Holy bread is the matter used in Baptism.',false,'Water is used in Baptism. Bread is associated with the Eucharist.','💧'),
       tf('Original sin is a wrong action that a baby personally chose to do.',false,'The lesson teaches that original sin is inherited. It is not a bad action personally chosen by a baby.'),
       tf('Baptized members of the Church are called to help build a caring community.',true,'We show our faith by loving and helping others.','🤝'),

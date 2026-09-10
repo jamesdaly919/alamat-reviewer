@@ -40,6 +40,7 @@ Vercel serves this repo directly with preset **Other**. Pushes to the linked pro
 | `data/activities.js` | Diagrams, map placement, drawing and AP help |
 | `data/*-1t.js` | Source-based subject banks |
 | `data/expansion.js`, `data/fact-expansion.js` | Reviewed extra questions and scenarios |
+| `data/true-false.js` | Authored true/false statements and explanations |
 | `data/option-pools.js` | Additional reviewed distractors and AP vocabulary |
 | `data/practice.js` | Rotation, option sampling and shuffling |
 | `data/illustrations.js` | Existing SVG pictures |
